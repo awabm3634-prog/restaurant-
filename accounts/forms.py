@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.forms import PasswordChangeForm
 from .models import BranchStaff
 
 GENERIC_ERROR = "بيانات الدخول غير صحيحة."
@@ -26,3 +26,12 @@ class StaffLoginForm(AuthenticationForm):
         ).exists()
         if not has_active_membership:
             raise ValidationError(GENERIC_ERROR, code="invalid_login")
+
+
+
+class ForcedPasswordChangeForm(PasswordChangeForm):
+    def clean_new_password1(self):
+        password = self.cleaned_data["new_password1"]
+        if self.user.check_password(password):
+            raise ValidationError("اختر كلمة مرور مختلفة عن المؤقتة.")
+        return password

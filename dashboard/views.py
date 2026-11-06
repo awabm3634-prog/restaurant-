@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.models import BranchStaff
+
+from .permissions import BranchAccessMixin, OwnerRequiredMixin
 
 
 @login_required
@@ -19,9 +20,9 @@ def entry(request):
     return redirect("dashboard:branch_home", branch_id=staff.branch_id)
 
 
-class OwnerHomeView(LoginRequiredMixin, TemplateView):
+class OwnerHomeView(OwnerRequiredMixin, TemplateView):
     template_name = "dashboard/owner_home.html"
 
 
-class BranchHomeView(LoginRequiredMixin, TemplateView):
+class BranchHomeView(BranchAccessMixin, TemplateView):
     template_name = "dashboard/branch_home.html"
