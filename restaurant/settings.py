@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "accounts:staff_login"
+LOGIN_REDIRECT_URL = "dashboard:entry"
+LOGOUT_REDIRECT_URL = "accounts:staff_login"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -64,7 +68,7 @@ ROOT_URLCONF = 'restaurant.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
