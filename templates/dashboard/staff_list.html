@@ -1,0 +1,20 @@
+{% extends "dashboard/base.html" %}
+{% block title %}الموظفين{% endblock %}
+{% block content %}
+  <h2>موظفو الفرع</h2>
+  <div class="box">
+    <table>
+      <tr><th>المستخدم</th><th>الدور</th><th>الحالة</th><th>انضم</th></tr>
+      {% for m in staff %}
+        <tr>
+          <td>{{ m.user.username }}</td>
+          <td>{{ m.get_role_display }}</td>
+          <td>{% if m.is_active %}فعّال{% else %}<span class="muted">معطّل</span>{% endif %}</td>
+          <td>{{ m.joined_at|date:"Y-m-d" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="muted">ما في موظفين بعد.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

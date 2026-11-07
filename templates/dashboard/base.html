@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}لوحة الفرع{% endblock %}</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f5f6f8; }
+    header { background: #1f3a5f; color: #fff; padding: 10px 16px;
+             display: flex; justify-content: space-between; align-items: center; }
+    nav { background: #fff; padding: 8px 16px; display: flex; gap: 16px;
+          flex-wrap: wrap; border-bottom: 1px solid #ddd; }
+    nav a { text-decoration: none; color: #1f3a5f; padding: 4px 0; }
+    nav a.active { font-weight: bold; border-bottom: 2px solid #1f3a5f; }
+    main { padding: 16px; max-width: 900px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; }
+    .box { overflow-x: auto; }
+    .muted { color: #888; }
+    button { padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>{{ branch.name }}</strong>
+    <span>
+      {{ request.user.username }}
+      <form method="post" action="{% url 'accounts:staff_logout' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">خروج</button>
+      </form>
+    </span>
+  </header>
+
+  <nav>
+    <a href="{% url 'dashboard:branch_home' branch.id %}"
+       {% if active == 'home' %}class="active"{% endif %}>الرئيسية</a>
+    {% if role == "BRANCH_MANAGER" or role == "OWNER" %}
+      <a href="{% url 'dashboard:staff_list' branch.id %}"
+         {% if active == 'staff' %}class="active"{% endif %}>الموظفين</a>
+    {% endif %}
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

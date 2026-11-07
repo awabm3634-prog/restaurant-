@@ -1,12 +1,6 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>لوحة</title></head>
-<body>
-  <h2>لوحة المالك</h2>
+{% extends "dashboard/base.html" %}
+{% block content %}
+  <h2>الرئيسية</h2>
   <p>أهلاً {{ request.user.username }}</p>
-  <form method="post" action="{% url 'accounts:staff_logout' %}">
-    {% csrf_token %}
-    <button type="submit">تسجيل الخروج</button>
-  </form>
-</body>
-</html>
+  <p>الموظفين النشطين في الفرع: <strong>{{ staff_count }}</strong></p>
+{% endblock %}
