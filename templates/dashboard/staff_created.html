@@ -1,0 +1,8 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+  <h2>تم إنشاء الحساب</h2>
+  <p>اسم المستخدم: <strong>{{ new_user.username }}</strong></p>
+  <p>كلمة المرور المؤقتة: <strong dir="ltr">{{ temp_password }}</strong></p>
+  <p class="muted">تظهر مرة واحدة فقط. سلّمها للموظف، وسيُطلب منه تغييرها عند أول دخول.</p>
+  <a href="{% url 'dashboard:staff_list' branch.id %}">قائمة الموظفين</a>
+{% endblock %}

@@ -2,6 +2,7 @@
 {% block title %}الموظفين{% endblock %}
 {% block content %}
   <h2>موظفو الفرع</h2>
+   <p><a href="{% url 'dashboard:staff_add' branch.id %}">+ إضافة موظف</a></p>
   <div class="box">
     <table>
       <tr><th>المستخدم</th><th>الدور</th><th>الحالة</th><th>انضم</th></tr>

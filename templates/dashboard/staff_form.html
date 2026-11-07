@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}
+{% block title %}إضافة موظف{% endblock %}
+{% block content %}
+  <h2>إضافة موظف</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">إضافة</button>
+    <a href="{% url 'dashboard:staff_list' branch.id %}">رجوع</a>
+  </form>
+{% endblock %}
