@@ -42,6 +42,9 @@
   </nav>
 
   <main>
+        {% for message in messages %}
+      <p style="padding:8px;background:#fff;border-right:4px solid #1f3a5f">{{ message }}</p>
+    {% endfor %}
     {% block content %}{% endblock %}
   </main>
 </body>

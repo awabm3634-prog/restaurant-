@@ -45,3 +45,30 @@ def create_branch_staff(*, actor_role, branch, username, role, first_name="", em
     membership.full_clean()
     membership.save()
     return user, temp_password
+
+@transaction.atomic
+def set_staff_active(*, actor_role, actor, membership, active):
+    # ما تعطّل نفسك، وما تلمس دور فوق صلاحيتك (مثلاً المدير ما يعطّل مديراً)
+    if membership.user_id == actor.id:
+        raise PermissionDenied
+    if membership.role not in creatable_roles(actor_role):
+        raise PermissionDenied
+
+    membership.is_active = active
+    membership.full_clean()  # يطبّق حد المديرين الثلاثة عند إعادة التفعيل
+    membership.save(update_fields=["is_active"])
+#-------------------------------------—————-------------------------
+
+@transaction.atomic
+def reset_staff_password(*, actor_role, actor, membership):
+    if membership.user_id == actor.id:
+        raise PermissionDenied
+    if membership.role not in creatable_roles(actor_role):
+        raise PermissionDenied
+
+    temp_password = make_temp_password()
+    user = membership.user
+    user.set_password(temp_password)
+    user.must_change_password = True
+    user.save(update_fields=["password", "must_change_password"])
+    return temp_password

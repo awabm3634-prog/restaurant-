@@ -12,6 +12,12 @@ from django.views.generic import FormView
 from accounts.services import create_branch_staff, creatable_roles
 
 from .forms import StaffCreateForm
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.views.generic import View
+
+from accounts.services import reset_staff_password, set_staff_active
 
 MANAGEMENT_ROLES = [Role.BRANCH_MANAGER, Role.OWNER]
 
@@ -51,7 +57,6 @@ class StaffListView(BranchAccessMixin, ListView):
     context_object_name = "staff"
 
     def get_queryset(self):
-        # الفلترة بـ self.branch هي اللي تعزل الفروع فعلياً
         return (
             BranchStaff.objects.filter(branch=self.branch)
             .select_related("user")
@@ -61,8 +66,8 @@ class StaffListView(BranchAccessMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["active"] = "staff"
+        context["manageable"] = creatable_roles(self.role)
         return context
-
 #------------------------------•------------------------
 
 
@@ -99,3 +104,51 @@ class StaffCreateView(BranchAccessMixin, FormView):
         # نعرض البيانات مرة واحدة ولا نخزنها في أي مكان
         context = self.get_context_data(new_user=user, temp_password=temp_password)
         return render(self.request, "dashboard/staff_created.html", context)
+#———————------------------------------------------------------------
+class StaffActionMixin(BranchAccessMixin):
+    allowed_roles = MANAGEMENT_ROLES
+    http_method_names = ["post"]  # الإجراءات POST فقط
+
+    def get_membership(self, pk):
+        # فلتر branch=self.branch يمنع لمس موظف فرع آخر حتى بتخمين الرقم
+        return get_object_or_404(
+            BranchStaff.objects.select_related("user"), pk=pk, branch=self.branch
+        )
+
+
+class StaffToggleActiveView(StaffActionMixin, View):
+    def post(self, request, branch_id, pk):
+        membership = self.get_membership(pk)
+        new_state = not membership.is_active
+        try:
+            set_staff_active(
+                actor_role=self.role,
+                actor=request.user,
+                membership=membership,
+                active=new_state,
+            )
+        except ValidationError as e:
+            messages.error(request, " ".join(e.messages))
+        else:
+            word = "تفعيل" if new_state else "تعطيل"
+            messages.success(request, f"تم {word} {membership.user.username}.")
+        return redirect("dashboard:staff_list", branch_id=self.branch.id)
+
+
+class StaffResetPasswordView(StaffActionMixin, View):
+    def post(self, request, branch_id, pk):
+        membership = self.get_membership(pk)
+        temp_password = reset_staff_password(
+            actor_role=self.role, actor=request.user, membership=membership
+        )
+        return render(
+            request,
+            "dashboard/staff_password_reset.html",
+            {
+                "branch": self.branch,
+                "role": self.role,
+                "active": "staff",
+                "member": membership,
+                "temp_password": temp_password,
+            },
+        )
