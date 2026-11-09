@@ -72,3 +72,15 @@ def reset_staff_password(*, actor_role, actor, membership):
     user.must_change_password = True
     user.save(update_fields=["password", "must_change_password"])
     return temp_password
+#------------------------------------------------------------------
+def has_dashboard_access(user):
+    """هل يقدر هذا المستخدم يدخل أي لوحة؟"""
+    if not user.is_authenticated or not user.is_active:
+        return False
+    if user.is_owner:
+        return True
+    if hasattr(user, "customer_profile"):
+        return False
+    return BranchStaff.objects.filter(
+        user=user, is_active=True, branch__is_active=True
+    ).exists()

@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ view.title }}{% endblock %}
+{% block content %}
+  <h2>{{ view.title }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">حفظ</button>
+    <a href="{% url 'menu:list' branch.id %}">رجوع</a>
+  </form>
+{% endblock %}

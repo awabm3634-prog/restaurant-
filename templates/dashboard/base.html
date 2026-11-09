@@ -33,6 +33,8 @@
   </header>
 
   <nav>
+          <a href="{% url 'menu:list' branch.id %}"
+         {% if active == 'menu' %}class="active"{% endif %}>المنيو</a>
     <a href="{% url 'dashboard:branch_home' branch.id %}"
        {% if active == 'home' %}class="active"{% endif %}>الرئيسية</a>
     {% if role == "BRANCH_MANAGER" or role == "OWNER" %}

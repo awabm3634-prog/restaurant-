@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>غير مسموح</title>
+</head>
+<body>
+  <h2>ليس لديك صلاحية لهذه الصفحة</h2>
+  <p><a href="{% url 'dashboard:entry' %}">الرجوع للوحتي</a></p>
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'accounts:staff_logout' %}">
+      {% csrf_token %}
+      <button type="submit">تسجيل الخروج</button>
+    </form>
+  {% endif %}
+</body>
+</html>
